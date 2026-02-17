@@ -29,11 +29,10 @@ async function initializeDatabase() {
     await client.connect();
     db = client.db("sterwa-db");
     usersCollection = db.collection("user-accounts");
-
     await usersCollection.createIndex({ email: 1 }, { unique: true });
 
     console.log("✅ MongoDB connected | Database: sterwa-db");
-    console.log("   - Collection 'user-accounts' ready with unique email index");
+    console.log("   - Collection 'user-accounts' is ready with unique email index");
   } catch (error) {
     console.error("⛔ FAILED to connect to MongoDB:");
     console.error(error.message);
@@ -68,16 +67,22 @@ async function closeDatabase() {
  * @param {string} userData.country
  * @returns {Promise<{success: boolean, message: string, user?: any}>}
  */
-async function registerUser({ email, password, phoneNumber, country }) {
+async function registerUser({ email, username, password, phoneNumber, country }) {
   try {
-    const normalizedEmail = email.toLowerCase().trim();
 
+    const normalizedEmail = email.toLowerCase().trim();
     const result = await usersCollection.insertOne({
       email: normalizedEmail,
+      username: username,
       password,               // WARNING: Hash this in production!
       phoneNumber: phoneNumber.trim(),
       country: country.trim(),
       createdAt: new Date(),
+      balData: {
+        bal: 0,
+        profit: 0,
+        dateUpdated: ''
+      }
     });
 
     return {
@@ -85,9 +90,8 @@ async function registerUser({ email, password, phoneNumber, country }) {
       message: "Account created successfully",
       user: {
         id: result.insertedId.toString(),
-        email: normalizedEmail,
-        phoneNumber,
-        country
+        username: username,
+        bal: 0
       }
     };
   } catch (error) {
@@ -120,7 +124,7 @@ async function findUserByEmail(email) {
     if (!user) {
       return {
         success: false,
-        message: "User not found"
+        message: "user not found"
       };
     }
 
@@ -128,6 +132,7 @@ async function findUserByEmail(email) {
       success: true,
       user
     };
+
   } catch (error) {
     console.error("Find user error:", error);
     return {

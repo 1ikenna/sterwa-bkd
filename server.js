@@ -32,29 +32,43 @@ app.get("/health", (req, res) => {
 //                  SIGNUP
 // ────────────────────────────────────────────────
 app.post("/api/auth/signup", async (req, res) => {
-  const { email, password, phoneNumber, country } = req.body;
+  const { email, username, password, phoneNumber, country } = req.body;
 
-  if (!email || !password || !phoneNumber || !country) {
-    return res.status(400).json({
+  if (!email || !username || !password || !phoneNumber || !country) {
+    return res.json({
       success: false,
-      message: "All fields are required: email, password, phoneNumber, country"
+      message: "All fields are required: email, username, password, phoneNumber, country"
     });
   }
 
-  if (password.length < 6) {
-    return res.status(400).json({
+  let db_user = await findUserByEmail(email);
+  let db_email; db_user.success?db_email = db_user.user.email:db_email = null;
+  //console.log(db_email, db_user);
+
+  if (db_email!=null && email == db_email) {
+    return res.json({
       success: false,
-      message: "Password must be at least 6 characters long"
+      message: "Account already registered in db.."
     });
   }
 
-  const result = await registerUser({ email, password, phoneNumber, country });
+
+  const result = await registerUser({ email, username, password, phoneNumber, country });
 
   if (result.success) {
-    return res.status(201).json(result);
+    console.log('new account created on: ', );
+    return res.json({
+      success: true,
+      message: "Account created successfully",
+      user: result.user
+    });
   }
 
-  return res.status(400).json(result);
+  return res.json({
+    success: false,
+    message: "Failed to create account..",
+
+  });
 });
 
 // ────────────────────────────────────────────────
@@ -64,7 +78,7 @@ app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({
+    return res.json({
       success: false,
       message: "Email and password are required"
     });
@@ -74,7 +88,7 @@ app.post("/api/auth/login", async (req, res) => {
 
   if (!result.success) {
     console.log('user not found...');
-    return res.status(401).json({
+    return res.json({
       success: false,
       message: "user not found"
     });
@@ -85,7 +99,7 @@ app.post("/api/auth/login", async (req, res) => {
   // WARNING: This is insecure — use bcrypt in production!
   if (user.password !== password) {
     console.log('user entered the wrong password..');
-    return res.status(401).json({
+    return res.json({
       success: false,
       message: "Invalid password"
     });
@@ -94,11 +108,11 @@ app.post("/api/auth/login", async (req, res) => {
   return res.json({
     success: true,
     message: "Login successful",
+    //user: user
     user: {
-      id: user._id.toString(),
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      country: user.country
+      username: user.username,
+      bal: user.bal,
+      profit: user.profit
     }
   });
 });
