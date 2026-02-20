@@ -116,13 +116,20 @@ async function storeLoginData(login_data) {
   try {
 
     const result = await user_login_data.insertOne(login_data);
+    if(!result) {
+      console.log('data not stored to db..');
+      return {
+        success: false,
+        message: "failed to store login data"
+      };
+    };
 
     return {
       success: true,
-      message: "login data stroed successfully",
+      message: "login data stored successfully",
     };
-  } catch (error) {
 
+  } catch (error) {
     console.error("storage error:", error);
     return {
       success: false,
