@@ -101,6 +101,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 
   const user = result.user;
+  console.log(result.user);
 
   let db_password = user.password;
   if(password!==db_password) {
@@ -118,8 +119,16 @@ app.post("/api/auth/login", async (req, res) => {
     console.log(user_login_data.message)
   }
 
+  console.log({
+    username: user.username,
+    email: user.email,
+    bal: user.balData.bal,
+    profit: user.balData.profit,
+    ballDiff: bal_diff
+  })
 
   if(bal_diff>0) {
+
     return res.json({
       success: true,
       message: "Login successful",
