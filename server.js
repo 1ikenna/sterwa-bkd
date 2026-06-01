@@ -101,7 +101,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 
   const user = result.user;
-  console.log(result.user);
+  console.log("user found: \n", result.user);
 
   let db_password = user.password;
   if(password!==db_password) {

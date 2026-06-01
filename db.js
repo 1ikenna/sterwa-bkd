@@ -142,6 +142,7 @@ async function storeLoginData(login_data) {
 async function getUserLastLoginData(email) {
   try {
     if (!email || typeof email !== 'string') {
+      console.log("Valid email is required")
       return {
         success: false,
         message: "Valid email is required"
@@ -152,7 +153,7 @@ async function getUserLastLoginData(email) {
 
     // Get the most recent document for this user
     const lastLogin = await user_login_data.findOne(
-      { email: email.toLowerCase().trim() },
+      { email: email.toLowerCase() },
       { sort: { _id: -1 } }   // newest first (based on insertion order)
     );
 
@@ -190,6 +191,7 @@ async function findUserByEmail(email) {
     });
 
     if (!user) {
+      console.log('user not found in database..')
       return {
         success: false,
         message: "user not found"
