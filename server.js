@@ -48,6 +48,7 @@ app.post("/api/auth/signup", async (req, res) => {
   //console.log(db_email, db_user);
 
   if (db_email!=null && email == db_email) {
+    console.log("Account already registered in db..")
     return res.json({
       success: false,
       message: "Account already registered in db.."
@@ -139,7 +140,7 @@ app.post("/api/auth/login", async (req, res) => {
         email: user.email,
         bal: user.balData.bal,
         profit: user.balData.profit,
-        portfolio: portfolio,
+        portfolio: user.portfolio,
         ballDiff: bal_diff
       }
     });
@@ -154,7 +155,7 @@ app.post("/api/auth/login", async (req, res) => {
       email: user.email,
       bal: user.balData.bal,
       profit: user.balData.profit,
-      portfolio: portfolio
+      portfolio: user.portfolio
     }
   });
 });
