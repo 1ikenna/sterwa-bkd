@@ -100,6 +100,8 @@ async function registerUser({ email, username, password, phone, country, fullnam
         id: result.insertedId.toString(),
         username: username,
         bal: "0",
+        profit: "0",
+        email: email,
         portfolio: {
           commodities: {value: "0", yield: "0.0%", change: "0.0%" },
           stocks: {value: "0", yield: "0.0%", change: "0.0%" },
