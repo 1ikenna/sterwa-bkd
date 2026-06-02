@@ -69,7 +69,7 @@ async function closeDatabase() {
  * @param {string} userData.country
  * @returns {Promise<{success: boolean, message: string, user?: any}>}
  */
-async function registerUser({ email, username, password, phone, country }) {
+async function registerUser({ email, username, password, phone, country, fullname }) {
   try {
     console.log(email.toLowerCase())
     const result = await usersCollection.insertOne({
@@ -78,6 +78,7 @@ async function registerUser({ email, username, password, phone, country }) {
       password,               // WARNING: Hash this in production!
       phone: phone,
       country: country,
+      fullname: fullname,
       createdAt: new Date(),
       balData: {
         bal: "0",

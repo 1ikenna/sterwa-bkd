@@ -34,7 +34,7 @@ app.get("/health", (req, res) => {
 //                  SIGNUP
 // ────────────────────────────────────────────────
 app.post("/api/auth/signup", async (req, res) => {
-  const { email, username, password, phone, country } = req.body;
+  const { email, username, password, phone, country, fullname } = req.body;
   console.log(req.body);
   if (!email || !username || !password) {
     return res.json({
@@ -56,9 +56,30 @@ app.post("/api/auth/signup", async (req, res) => {
   }
 
 
-  const result = await registerUser({ email, username, password, phone, country });
+  const result = await registerUser({ email, username, password, phone, country, fullname });
   const user = result.user;
+  //let {uname, mail, bal, profit} = user;
+  if (user)
+  console.log('proceeding to store user data as first login');
+                    let login_data = {username: user.username, email: user.email, bal: user.bal, profit: user.profit, lastLogin: new Date().toLocaleString("en-US", {
+                      timeZone: "Africa/Lagos",
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      hour12: false
+                    })};
 
+                    console.log(login_data);
+                    let store_login_time = await storeLoginData(login_data);
+
+                    if (store_login_time.data.success) {
+                      console.log('first login data stored successfully..')
+                    } else {
+                      console.log('store-login-data API error..')
+                    };
   if (result.success) {
     console.log('new account created on: ', );
     return res.json({
@@ -66,6 +87,7 @@ app.post("/api/auth/signup", async (req, res) => {
       message: "Account created successfully",
       user: {
         username: user.username,
+        firstname: user.fullname?user.fullname.split(" ")[0]:null,
         bal: user.bal,
         portfolio: user.portfolio,
       }
@@ -138,6 +160,7 @@ app.post("/api/auth/login", async (req, res) => {
       //user: user
       user: {
         username: user.username,
+        firstname: user.fullname?user.fullname.split(" ")[0]:null,
         email: user.email,
         bal: user.balData.bal,
         profit: user.balData.profit,
@@ -153,6 +176,7 @@ app.post("/api/auth/login", async (req, res) => {
     //user: user
     user: {
       username: user.username,
+      firstname: user.fullname?user.fullname.split(" ")[0]:null,
       email: user.email,
       bal: user.balData.bal,
       profit: user.balData.profit,
@@ -166,6 +190,7 @@ app.post("/api/auth/store-login-data", async (req, res) => {
 
 
   if (!username && !email && !bal && !profit && !lastLogin) {
+    console.log("incomplete login data..")
     return res.json({
       success: false,
       message: "incomplete login data.."
