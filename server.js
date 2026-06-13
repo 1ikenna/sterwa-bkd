@@ -86,6 +86,7 @@ app.post("/api/auth/signup", async (req, res) => {
         user: {
           username: user.username,
           firstname: user.fullname?user.fullname.split(" ")[0]:null,
+          profit: user.profit,
           bal: user.bal,
           portfolio: user.portfolio,
         }
